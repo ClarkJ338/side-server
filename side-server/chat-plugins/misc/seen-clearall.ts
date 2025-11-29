@@ -1,17 +1,10 @@
-/*
-* Pokemon Showdown - Impulse Server
-* Seen & Clearall chat-plugin.
-* @licemse MIT
-*/
 import { FS } from '../../../lib';
 import { Table } from '../../utils';
 import { toID } from '../../../sim/dex';
 
 const DATA_FILE = 'side-server/db/seen.json';
 
-interface SeenData {
-	[userid: string]: number;
-}
+type SeenData = Record<string, number>;
 
 let seenData: SeenData = {};
 
@@ -39,7 +32,7 @@ const trackSeen = (userid: string): void => {
 };
 
 const getLastSeen = (userid: string): number | null => {
-	return seenData[userid] || null;
+	return seenData[userid] ?? null;
 };
 
 const getRecentUsers = (limit = 50): { userid: string, date: number }[] => {
@@ -179,7 +172,7 @@ export const commands: Chat.ChatCommands = {
 			this.checkCan('roomowner');
 			if (!this.runBroadcast()) return;
 
-			const days = parseInt(target) || 365;
+			const days = parseInt(target) || 25;
 			if (days < 30) throw new Chat.ErrorMessage('Minimum: 30 days.');
 
 			const deleted = cleanupOldSeen(days);
