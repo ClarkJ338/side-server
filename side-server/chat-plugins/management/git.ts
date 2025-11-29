@@ -11,18 +11,23 @@ import { execSync } from 'child_process';
 
 const findGitRoot = async (startPath: string): Promise<string | null> => {
 	let currentPath = FS(startPath);
+	const rootPath = FS('/').path; // Treat the filesystem root as the ultimate stop
 
 	while (true) {
-		const gitPath = FS(`${currentPath.path}/.git`);
+		const gitPath = currentPath.resolve('.git');
+
 		if (await gitPath.exists()) {
 			return currentPath.path;
 		}
 
-		const parentPath = currentPath.parentDir();
-		if (parentPath.path === currentPath.path) {
+		const parentPath = currentPath.parentDir().path;
+
+		// Stop if we reach the root path or if the parent path is the same (e.g., already at root)
+		if (currentPath.path === rootPath || parentPath === currentPath.path) {
 			return null;
 		}
-		currentPath = parentPath;
+
+		currentPath = FS(parentPath);
 	}
 };
 
@@ -39,8 +44,7 @@ const executeGitCommand = async (command: string, gitRoot: string): Promise<stri
 		});
 		return output;
 	} catch (err: unknown) {
-		const message = getErrorMessage(err);
-		throw new Chat.ErrorMessage(`${command} failed: ${message}`);
+		throw new Chat.ErrorMessage(`${command} failed: ${getErrorMessage(err)}`);
 	}
 };
 
