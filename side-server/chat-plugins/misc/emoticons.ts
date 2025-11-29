@@ -1,9 +1,3 @@
-/*
-* Pokemon Showdown - Impulse Server
-* Emoticons chat-plugin.
-* @author PrinceSky-Git
-* @license MIT
-*/
 import { FS, Utils } from '../../../lib';
 import { Table } from '../../utils';
 import { toID } from '../../../sim/dex';
@@ -17,9 +11,9 @@ interface EmoticonEntry {
 }
 
 interface EmoticonData {
-	emoticons: { [name: string]: EmoticonEntry };
+	emoticons: Record<string, EmoticonEntry>;
 	emoteSize: number;
-	ignores: { [userId: string]: boolean };
+	ignores: Record<string, boolean>;
 }
 
 let data: EmoticonData = {
@@ -28,12 +22,12 @@ let data: EmoticonData = {
 	ignores: {},
 };
 
-let emoticons: { [key: string]: string } = {};
+let emoticons: Record<string, string> = {};
 let emoteRegex = /^$/g;
 
-SS.ignoreEmotes = {} as { [userId: string]: boolean };
+SS.ignoreEmotes = {} as Record<string, boolean>;
 
-const getEmoteSize = (): string => (data.emoteSize || 32).toString();
+const getEmoteSize = (): string => (data.emoteSize ?? 32).toString();
 
 function parseMessage(message: string): string {
 	if (message.substr(0, 5) === "/html") {
@@ -62,9 +56,9 @@ const loadEmoticons = async (): Promise<void> => {
 		if (raw) {
 			const json = JSON.parse(raw);
 			data = {
-				emoticons: json.emoticons || {},
-				emoteSize: json.emoteSize || 32,
-				ignores: json.ignores || {},
+				emoticons: json.emoticons ?? {},
+				emoteSize: json.emoteSize ?? 32,
+				ignores: json.ignores ?? {},
 			};
 		} else {
 			saveData();
@@ -75,7 +69,7 @@ const loadEmoticons = async (): Promise<void> => {
 			emoticons[name] = entry.url;
 		}
 
-		SS.ignoreEmotes = data.ignores || {};
+		SS.ignoreEmotes = data.ignores ?? {};
 		
 		buildEmoteRegex();
 	} catch (e) {
@@ -91,7 +85,7 @@ const saveEmoteSize = async (size: number): Promise<void> => {
 };
 
 const addEmoticon = async (name: string, url: string, user: User): Promise<void> => {
-	if (!data.emoticons) data.emoticons = {};
+	data.emoticons ??= {};
 	
 	data.emoticons[name] = {
 		url,
@@ -152,7 +146,7 @@ export const commands: Chat.ChatCommands = {
 				throw new Chat.ErrorMessage("Emoticons may not be longer than 10 characters.");
 			}
 			
-			if (data.emoticons && data.emoticons[name]) {
+			if (data.emoticons?.[name]) {
 				throw new Chat.ErrorMessage(`${name} is already an emoticon.`);
 			}
 
@@ -166,7 +160,7 @@ export const commands: Chat.ChatCommands = {
 			this.checkCan('roomowner');
 			if (!target) return this.parse("/emoticon help");
 
-			if (!data.emoticons || !data.emoticons[target]) {
+			if (!data.emoticons?.[target]) {
 				throw new Chat.ErrorMessage("That emoticon does not exist.");
 			}
 
@@ -207,7 +201,7 @@ export const commands: Chat.ChatCommands = {
 				throw new Chat.ErrorMessage('Already ignoring emoticons.');
 			}
 			
-			if (!data.ignores) data.ignores = {};
+			data.ignores ??= {};
 			data.ignores[user.id] = true;
 			SS.ignoreEmotes[user.id] = true;
 			saveData();
@@ -220,7 +214,7 @@ export const commands: Chat.ChatCommands = {
 				throw new Chat.ErrorMessage('Not ignoring emoticons.');
 			}
 			
-			if (data.ignores) delete data.ignores[user.id];
+			delete data.ignores?.[user.id];
 			delete SS.ignoreEmotes[user.id];
 			saveData();
 
@@ -245,13 +239,13 @@ export const commands: Chat.ChatCommands = {
 			if (!this.runBroadcast()) return;
 			if (!target) throw new Chat.ErrorMessage('Usage: /emoticon info <name>');
 
-			const emote = data.emoticons ? data.emoticons[target] : null;
+			const emote = data.emoticons?.[target];
 			if (!emote) throw new Chat.ErrorMessage(`Emoticon "${target}" not found.`);
 
 			const rows = [
 				[`<img src="${emote.url}" height="40" width="40">`],
-				[`<b>URL:</b> ${Utils.escapeHTML(emote.url || '')}`],
-				[`<b>Added by:</b> ${Impulse.nameColor(emote.addedBy || 'Unknown', true, true)}`],
+				[`<b>URL:</b> ${Utils.escapeHTML(emote.url ?? '')}`],
+				[`<b>Added by:</b> ${Impulse.nameColor(emote.addedBy ?? 'Unknown', true, true)}`],
 				[`<b>Added:</b> ${emote.addedAt ? new Date(emote.addedAt).toUTCString() : 'Unknown'}`],
 			];
 
