@@ -8,7 +8,7 @@ import { FS, Utils } from '../../../lib';
 import { Table } from '../../utils';
 import { toID } from '../../../sim/dex';
 
-const DATA_FILE = 'impulse/db/emoticons.json';
+const DATA_FILE = 'side-server/db/emoticons.json';
 
 interface EmoticonEntry {
 	url: string;
