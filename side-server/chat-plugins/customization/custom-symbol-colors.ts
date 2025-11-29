@@ -1,9 +1,3 @@
-/*
-* Pokemon Showdown
-* Symbol Colors Commands
-* @author PrinceSky-Git
-* @license MIT
-*/
 import { FS } from '../../../lib';
 import { toID } from '../../../sim/dex';
 
@@ -21,9 +15,7 @@ interface SymbolColorEntry {
 	updatedAt: number;
 }
 
-interface SymbolColorData {
-	[userid: string]: SymbolColorEntry;
-}
+type SymbolColorData = Record<string, SymbolColorEntry>;
 
 let data: SymbolColorData = {};
 
@@ -77,9 +69,8 @@ const updateSymbolColors = (): void => {
 				const pre = fileContent.substring(0, startIndex);
 				const post = fileContent.substring(endIndex + END_TAG.length);
 				return pre + cssBlock + post;
-			} else {
-				return fileContent + '\n' + cssBlock + '\n';
 			}
+			return fileContent + '\n' + cssBlock + '\n';
 		});
 
 		if (typeof Impulse !== 'undefined' && Impulse.reloadCSS) {
@@ -107,9 +98,7 @@ const sendSymbolColorNotifications = (
 		if (user?.connected) {
 			user.popup(`|html|${staffHtml} has removed your symbol color.`);
 		}
-		if (room) {
-			room.add(`|html|<div class="infobox">${staffHtml} removed symbol color for ${targetHtml}.</div>`).update();
-		}
+		room?.add(`|html|<div class="infobox">${staffHtml} removed symbol color for ${targetHtml}.</div>`).update();
 		return;
 	}
 
