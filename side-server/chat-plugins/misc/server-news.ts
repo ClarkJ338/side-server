@@ -1,9 +1,3 @@
-/*
-* Pokemon Showdown - Impulse Server
-* News chat-plugin.
-* @author PrinceSky-Git
-* @license MIT
-*/
 import { FS } from '../../../lib';
 import { toID } from '../../../sim/dex';
 
@@ -19,8 +13,8 @@ interface NewsEntry {
 }
 
 interface ServerNewsData {
-	news: { [id: string]: NewsEntry };
-	blocks: { [userId: string]: boolean };
+	news: Record<string, NewsEntry>;
+	blocks: Record<string, boolean>;
 }
 
 let data: ServerNewsData = {
@@ -28,7 +22,7 @@ let data: ServerNewsData = {
 	blocks: {},
 };
 
-const serverName = Config.serverName || 'Impulse';
+const serverName = Config.serverName ?? 'Impulse';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const formatDate = (date: Date = new Date()): string =>
@@ -43,15 +37,13 @@ const loadData = async (): Promise<void> => {
 		const raw = await FS(DATA_FILE).readIfExists();
 		if (raw) {
 			const json = JSON.parse(raw);
-			// Merge with defaults to prevent crashes if keys are missing
 			data = {
-				news: json.news || {},
-				blocks: json.blocks || {},
+				news: json.news ?? {},
+				blocks: json.blocks ?? {},
 			};
 		}
 	} catch (e) {
 		console.error('Failed to load server news:', e);
-		// If load fails, keep default empty state to prevent crashes
 		data = { news: {}, blocks: {} };
 	}
 };
@@ -59,7 +51,6 @@ const loadData = async (): Promise<void> => {
 void loadData();
 
 const generateNewsDisplay = (): string[] => {
-	// Safety check just in case
 	if (!data.news) return [];
 
 	const news = Object.values(data.news)
@@ -73,9 +64,8 @@ const generateNewsDisplay = (): string[] => {
 };
 
 const onUserConnect = (user: User): void => {
-	// Robust checks for data existence
 	if (!data.news || Object.keys(data.news).length === 0) return;
-	if (data.blocks && data.blocks[user.id]) return;
+	if (data.blocks?.[user.id]) return;
 
 	const news = generateNewsDisplay();
 	if (news.length) {
@@ -84,7 +74,7 @@ const onUserConnect = (user: User): void => {
 };
 
 const addNews = (id: string, title: string, desc: string, user: User): void => {
-	if (!data.news) data.news = {};
+	data.news ??= {};
 	data.news[id] = {
 		id,
 		title,
@@ -97,20 +87,20 @@ const addNews = (id: string, title: string, desc: string, user: User): void => {
 };
 
 const deleteNews = (id: string): boolean => {
-	if (!data.news || !data.news[id]) return false;
+	if (!data.news?.[id]) return false;
 	delete data.news[id];
 	saveData();
 	return true;
 };
 
 const blockNews = (userid: string): void => {
-	if (!data.blocks) data.blocks = {};
+	data.blocks ??= {};
 	data.blocks[userid] = true;
 	saveData();
 };
 
 const unblockNews = (userid: string): boolean => {
-	if (!data.blocks || !data.blocks[userid]) return false;
+	if (!data.blocks?.[userid]) return false;
 	delete data.blocks[userid];
 	saveData();
 	return true;
@@ -157,7 +147,7 @@ export const commands: Chat.ChatCommands = {
 			const [title, desc] = args;
 			const id = toID(title);
 
-			if (data.news && data.news[id]) {
+			if (data.news?.[id]) {
 				throw new Chat.ErrorMessage(`"${title}" exists.`);
 			}
 
@@ -180,7 +170,7 @@ export const commands: Chat.ChatCommands = {
 
 		block(target, room, user): void {
 			const userid = toID(user.name);
-			if (data.blocks && data.blocks[userid]) {
+			if (data.blocks?.[userid]) {
 				throw new Chat.ErrorMessage("You have already blocked server news.");
 			}
 
