@@ -245,7 +245,7 @@ export const commands: Chat.ChatCommands = {
 			const rows = [
 				[`<img src="${emote.url}" height="40" width="40">`],
 				[`<b>URL:</b> ${Utils.escapeHTML(emote.url ?? '')}`],
-				[`<b>Added by:</b> ${Impulse.nameColor(emote.addedBy ?? 'Unknown', true, true)}`],
+				[`<b>Added by:</b> ${SS.nameColor(emote.addedBy ?? 'Unknown', true, true)}`],
 				[`<b>Added:</b> ${emote.addedAt ? new Date(emote.addedAt).toUTCString() : 'Unknown'}`],
 			];
 
