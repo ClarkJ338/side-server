@@ -16,6 +16,11 @@ exports.port = 8000;
 exports.bindaddress = '0.0.0.0';
 
 /**
+* Only WhiteListed users can use certain commands e.g all files commands
+*/
+exports.WhiteListed = ['clarkj338', 'txbugtrainer'];
+
+/**
  * wsdeflate - compresses WebSocket messages
  *  Toggles use of the Sec-WebSocket-Extension permessage-deflate extension.
  *  This compresses messages sent and received over a WebSocket connection
