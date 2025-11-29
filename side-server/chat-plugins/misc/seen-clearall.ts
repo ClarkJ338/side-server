@@ -7,7 +7,7 @@ import { FS } from '../../../lib';
 import { Table } from '../../utils';
 import { toID } from '../../../sim/dex';
 
-const DATA_FILE = 'impulse/db/seen.json';
+const DATA_FILE = 'side-server/db/seen.json';
 
 interface SeenData {
 	[userid: string]: number;
