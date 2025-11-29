@@ -12,7 +12,6 @@ const CONFIG = {
 	staffRoom: 'staff',
 	maxSize: 5 * 1024 * 1024, // 5MB
 	timeout: 10000,
-	baseUrl: Config.avatarUrl || 'https://impulse-server.fun/avatars/',
 };
 
 const IMAGE_FORMATS: { [ext: string]: number[] } = {
