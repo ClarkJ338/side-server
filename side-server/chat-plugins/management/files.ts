@@ -50,8 +50,7 @@ export const commands: Chat.ChatCommands = {
 				`</details>`
 			);
 		} catch (err: unknown) {
-			const message = getErrorMessage(err);
-			throw new Chat.ErrorMessage(`Failed to read file: ${message}`);
+			throw new Chat.ErrorMessage(`Failed to read file: ${getErrorMessage(err)}`);
 		}
 	},
 	filereadhelp: [
@@ -80,8 +79,7 @@ export const commands: Chat.ChatCommands = {
 
 			return this.sendReply(`File deleted: ${filePath}`);
 		} catch (err: unknown) {
-			const message = getErrorMessage(err);
-			throw new Chat.ErrorMessage(`Failed to delete file: ${message}`);
+			throw new Chat.ErrorMessage(`Failed to delete file: ${getErrorMessage(err)}`);
 		}
 	},
 	filedeletehelp: [
@@ -110,8 +108,7 @@ export const commands: Chat.ChatCommands = {
 
 			return this.sendReply(`File moved from ${source} to ${destination}`);
 		} catch (err: unknown) {
-			const message = getErrorMessage(err);
-			throw new Chat.ErrorMessage(`Failed to move file: ${message}`);
+			throw new Chat.ErrorMessage(`Failed to move file: ${getErrorMessage(err)}`);
 		}
 	},
 	filemovehelp: [
@@ -141,8 +138,7 @@ export const commands: Chat.ChatCommands = {
 
 			return this.sendReply(`File copied from ${source} to ${destination}`);
 		} catch (err: unknown) {
-			const message = getErrorMessage(err);
-			throw new Chat.ErrorMessage(`Failed to copy file: ${message}`);
+			throw new Chat.ErrorMessage(`Failed to copy file: ${getErrorMessage(err)}`);
 		}
 	},
 	filecopyhelp: [
@@ -171,8 +167,7 @@ export const commands: Chat.ChatCommands = {
 
 			return this.sendReply(`File renamed from ${source} to ${destination}`);
 		} catch (err: unknown) {
-			const message = getErrorMessage(err);
-			throw new Chat.ErrorMessage(`Failed to rename file: ${message}`);
+			throw new Chat.ErrorMessage(`Failed to rename file: ${getErrorMessage(err)}`);
 		}
 	},
 	filerenamehelp: [
@@ -202,7 +197,7 @@ export const commands: Chat.ChatCommands = {
 			}
 
 			const content = await file.read();
-			const fileName = filePath.split('/').pop() || 'file.txt';
+			const fileName = filePath.split('/').pop() ?? 'file.txt';
 
 			const gistData = {
 				description: `Uploaded from Pokemon Showdown: ${filePath}`,
@@ -226,7 +221,7 @@ export const commands: Chat.ChatCommands = {
 			});
 
 			if (!response.ok) {
-				const errorData = await response.json();
+				const errorData = await response.json().catch(() => ({}));
 				const errorMsg = errorData.message || response.statusText;
 				throw new Chat.ErrorMessage(`Failed to upload to Gist: ${errorMsg}`);
 			}
@@ -239,8 +234,7 @@ export const commands: Chat.ChatCommands = {
 				`Gist URL: <a href="${result.html_url}" target="_blank">${result.html_url}</a>`
 			);
 		} catch (err: unknown) {
-			const message = getErrorMessage(err);
-			throw new Chat.ErrorMessage(`Failed to upload file: ${message}`);
+			throw new Chat.ErrorMessage(`Failed to upload file: ${getErrorMessage(err)}`);
 		}
 	},
 	fileuploadhelp: [
@@ -280,8 +274,7 @@ export const commands: Chat.ChatCommands = {
 				`File saved successfully: ${filePath} (${content.length} bytes)`
 			);
 		} catch (err: unknown) {
-			const message = getErrorMessage(err);
-			throw new Chat.ErrorMessage(`Failed to save file: ${message}`);
+			throw new Chat.ErrorMessage(`Failed to save file: ${getErrorMessage(err)}`);
 		}
 	},
 	filesavehelp: [
