@@ -54,7 +54,7 @@ export const commands: Chat.ChatCommands = {
 			throw new Chat.ErrorMessage('Could not find git root directory.');
 		}
 
-		const output = await executeGitCommand('sudo git pull', gitRoot);
+		const output = await executeGitCommand('git pull', gitRoot);
 		const html = `<details><summary>Git pull completed</summary>` +
 			`<pre>${Utils.escapeHTML(output)}</pre></details>`;
 		return this.sendReplyBox(html);
@@ -72,7 +72,7 @@ export const commands: Chat.ChatCommands = {
 			throw new Chat.ErrorMessage('Could not find git root directory.');
 		}
 
-		const output = await executeGitCommand('sudo git status', gitRoot);
+		const output = await executeGitCommand('git status', gitRoot);
 		const html = `<details><summary>Git status</summary>` +
 			`<pre>${Utils.escapeHTML(output)}</pre></details>`;
 		return this.sendReplyBox(html);
