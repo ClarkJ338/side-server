@@ -1,10 +1,3 @@
-/*
-* Pokemon Showdown
-* Files Commands
-* Allows reading, deleting, uploading and more from chatrooms.
-* @author PrinceSky-Git
-* @license MIT
-*/
 import { FS, Utils } from '../../../lib';
 
 const checkWhitelist = (user: User): void => {
@@ -222,7 +215,7 @@ export const commands: Chat.ChatCommands = {
 
 			if (!response.ok) {
 				const errorData = await response.json().catch(() => ({}));
-				const errorMsg = errorData.message || response.statusText;
+				const errorMsg = errorData.message ?? response.statusText;
 				throw new Chat.ErrorMessage(`Failed to upload to Gist: ${errorMsg}`);
 			}
 
