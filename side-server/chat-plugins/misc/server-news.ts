@@ -7,7 +7,7 @@
 import { FS } from '../../../lib';
 import { toID } from '../../../sim/dex';
 
-const DATA_FILE = 'impulse/db/server-news.json';
+const DATA_FILE = 'side-server/db/server-news.json';
 
 interface NewsEntry {
 	id: string;
