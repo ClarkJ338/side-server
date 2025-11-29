@@ -7,7 +7,7 @@
 import { FS } from '../../../lib';
 import { toID } from '../../../sim/dex';
 
-const DATA_FILE = 'impulse/db/custom-symbol-colors.json';
+const DATA_FILE = 'side-server/db/custom-symbol-colors.json';
 const CONFIG_PATH = 'config/custom.css';
 const STAFF_ROOM_ID = 'staff';
 const START_TAG = '/* SYMBOLCOLORS START */';
