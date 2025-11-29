@@ -11,7 +11,7 @@ import { toID } from '../../../sim/dex';
 interface RGB { R: number; G: number; B: number }
 interface CustomColors { [userid: string]: string }
 
-const DATA_FILE = 'impulse/db/custom-colors.json';
+const DATA_FILE = 'side-server/db/custom-colors.json';
 const STAFF_ROOM_ID = 'staff';
 const CONFIG_PATH = 'config/custom.css';
 const COLORS_START_TAG = '/* COLORS START */';
