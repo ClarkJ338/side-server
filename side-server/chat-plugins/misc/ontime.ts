@@ -1,8 +1,3 @@
-/*
-* Pokemon Showdown
-* Ontime chat-plugin.
-* @license MIT
-*/
 import { FS } from '../../../lib';
 import { Table } from '../../utils';
 import { toID } from '../../../sim/dex';
@@ -11,8 +6,8 @@ const DATA_FILE = 'side-server/db/ontime.json';
 const ONTIME_LEADERBOARD_SIZE = 100;
 
 interface OntimeData {
-	ontime: { [userid: string]: number };
-	blocks: { [userid: string]: boolean };
+	ontime: Record<string, number>;
+	blocks: Record<string, boolean>;
 }
 
 let data: OntimeData = {
@@ -30,8 +25,8 @@ const loadData = async (): Promise<void> => {
 		if (raw) {
 			const json = JSON.parse(raw);
 			data = {
-				ontime: json.ontime || {},
-				blocks: json.blocks || {},
+				ontime: json.ontime ?? {},
+				blocks: json.blocks ?? {},
 			};
 		}
 	} catch (e) {
@@ -66,11 +61,11 @@ export const getCurrentSessionTime = (user: User | undefined): number => {
 };
 
 export const getTotalOntime = (userid: string): number => {
-	return data.ontime[userid] || 0;
+	return data.ontime[userid] ?? 0;
 };
 
 const updateOntime = (userid: string, sessionTime: number): void => {
-	if (!data.ontime[userid]) data.ontime[userid] = 0;
+	data.ontime[userid] ??= 0;
 	data.ontime[userid] += sessionTime;
 	saveData();
 };
