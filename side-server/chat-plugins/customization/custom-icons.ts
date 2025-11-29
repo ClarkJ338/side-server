@@ -1,8 +1,3 @@
-/*
-* Pokemon Showdown
-* Custom Icons Commands
-* @license MIT
-*/
 import { FS } from '../../../lib';
 import { toID } from '../../../sim/dex';
 
@@ -23,9 +18,7 @@ interface IconEntry {
 	updatedAt: number;
 }
 
-interface IconData {
-	[userid: string]: IconEntry;
-}
+type IconData = Record<string, IconEntry>;
 
 let data: IconData = {};
 
@@ -71,7 +64,7 @@ const updateIcons = (): void => {
 		const bust = cacheBuster();
 
 		const cssRules = Object.entries(data).map(([userId, entry]) => {
-			const size = entry.size || DEFAULT_ICON_SIZE;
+			const size = entry.size ?? DEFAULT_ICON_SIZE;
 			return `[id$="-userlist-user-${userId}"] { background: url("${entry.url}${bust}") right no-repeat !important; background-size: ${size}px!important;}`;
 		}).join('\n');
 
@@ -89,9 +82,8 @@ const updateIcons = (): void => {
 				const pre = fileContent.substring(0, startIndex);
 				const post = fileContent.substring(endIndex + ICONS_END_TAG.length);
 				return pre + cssBlock + post;
-			} else {
-				return fileContent + '\n' + cssBlock + '\n';
 			}
+			return fileContent + '\n' + cssBlock + '\n';
 		});
 		
 		if (typeof Impulse !== 'undefined' && Impulse.reloadCSS) {
@@ -155,8 +147,8 @@ export const commands: Chat.ChatCommands = {
 
 			const now = Date.now();
 			data[userId] = {
-				url: url,
-				size: size,
+				url,
+				size,
 				setBy: user.id,
 				createdAt: now,
 				updatedAt: now,
@@ -188,7 +180,6 @@ export const commands: Chat.ChatCommands = {
 				updateFields.size = size;
 			}
 
-			// Merge updates into existing data
 			Object.assign(data[userId], updateFields);
 			saveData();
 			updateIcons();
@@ -220,7 +211,7 @@ export const commands: Chat.ChatCommands = {
 		help() {
 			if (!this.runBroadcast()) return;
 			const helpList = [
-				{ cmd: "/icon set [user], [url], [size]", desc: `Set icon (${DEFAULT_ICON_SIZE}-${MAX_SIZE}px). Requires: &.` },
+				{ cmd: "/icon set [user], [url], [size]", desc: `Set icon (${MIN_SIZE}-${MAX_SIZE}px). Requires: &.` },
 				{ cmd: "/icon update [user], [url], [size]", desc: "Update icon. Requires: &." },
 				{ cmd: "/icon delete [user]", desc: "Remove icon. Requires: &." },
 			];
