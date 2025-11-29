@@ -1,15 +1,9 @@
-/*
-* Pokemon Showdown
-* Custom Symbol Commands
-* @author PrinceSky-Git
-* @license MIT
-*/
 import { FS } from '../../../lib';
 import { toID } from '../../../sim/dex';
 
 const DATA_FILE = 'side-server/db/custom-symbol.json';
 const STAFF_ROOM_ID = 'staff';
-const BLOCKED_SYMBOLS = ['➦', '~', '&', '#', '@', '%', '*', '+'];
+const BLOCKED_SYMBOLS = new Set(['➦', '~', '&', '#', '@', '%', '*', '+']);
 
 interface CustomSymbolEntry {
 	symbol: string;
@@ -18,9 +12,7 @@ interface CustomSymbolEntry {
 	updatedAt: number;
 }
 
-interface CustomSymbolData {
-	[userid: string]: CustomSymbolEntry;
-}
+type CustomSymbolData = Record<string, CustomSymbolEntry>;
 
 let data: CustomSymbolData = {};
 
@@ -51,8 +43,8 @@ const validateSymbol = (symbol: string): { valid: boolean; error?: string } => {
 	if (!symbol || symbol.length !== 1) {
 		return { valid: false, error: 'Symbol must be a single character.' };
 	}
-	if (BLOCKED_SYMBOLS.includes(symbol)) {
-		return { valid: false, error: `The following symbols are blocked: ${BLOCKED_SYMBOLS.join(' ')}` };
+	if (BLOCKED_SYMBOLS.has(symbol)) {
+		return { valid: false, error: `The following symbols are blocked: ${[...BLOCKED_SYMBOLS].join(' ')}` };
 	}
 	return { valid: true };
 };
@@ -64,7 +56,7 @@ const applyCustomSymbol = (userid: string): void => {
 	const symbolEntry = data[userid];
 
 	if (symbolEntry) {
-		if (!user.originalGroup) user.originalGroup = user.tempGroup;
+		user.originalGroup ??= user.tempGroup;
 		user.customSymbol = symbolEntry.symbol;
 		user.updateIdentity();
 	}
@@ -75,7 +67,7 @@ const removeCustomSymbol = (userid: string): void => {
 	if (!user) return;
 
 	delete user.customSymbol;
-	if (user.originalGroup) delete user.originalGroup;
+	delete user.originalGroup;
 	user.updateIdentity();
 };
 
@@ -95,9 +87,7 @@ const sendSymbolNotifications = (
 		if (user?.connected) {
 			user.popup(`|html|${staffHtml} has removed your custom symbol.<br /><center>Refresh to see changes.</center>`);
 		}
-		if (room) {
-			room.add(`|html|<div class="infobox">${staffHtml} removed custom symbol for ${targetHtml}.</div>`).update();
-		}
+		room?.add(`|html|<div class="infobox">${staffHtml} removed custom symbol for ${targetHtml}.</div>`).update();
 		return;
 	}
 
@@ -142,7 +132,6 @@ export const commands: Chat.ChatCommands = {
 				updatedAt: now,
 			};
 			saveData();
-
 			applyCustomSymbol(userId);
 
 			const targetHtml = SS.nameColor(name, true, false);
@@ -166,7 +155,6 @@ export const commands: Chat.ChatCommands = {
 			data[userId].symbol = symbol;
 			data[userId].updatedAt = Date.now();
 			saveData();
-			
 			applyCustomSymbol(userId);
 
 			const targetHtml = SS.nameColor(name, true, false);
@@ -206,7 +194,7 @@ export const commands: Chat.ChatCommands = {
 				`<center><strong>Custom Symbol Commands:</strong><br>Alias: /cs</center>`,
 				`<hr><ul style="list-style-type:none;padding-left:0;">`,
 				listHtml,
-				`</ul><small>Blocked symbols: ${BLOCKED_SYMBOLS.join(' ')}</small>`
+				`</ul><small>Blocked symbols: ${[...BLOCKED_SYMBOLS].join(' ')}</small>`
 			].join('');
 			
 			this.sendReplyBox(html);
@@ -226,15 +214,15 @@ Users.User.prototype.getIdentity = function (room: BasicRoom | null = null): str
 
 	if (!customSymbol) return originalGetIdentity.call(this, room);
 
-	const punishgroups = Config.punishgroups || { locked: null, muted: null };
+	const punishgroups = Config.punishgroups ?? { locked: null, muted: null };
 	
 	if (this.locked || this.namelocked) {
-		return (punishgroups.locked?.symbol || '\u203d') + this.name;
+		return (punishgroups.locked?.symbol ?? '\u203d') + this.name;
 	}
 
 	if (room) {
 		if (room.isMuted(this)) {
-			return (punishgroups.muted?.symbol || '!') + this.name;
+			return (punishgroups.muted?.symbol ?? '!') + this.name;
 		}
 		const roomGroup = room.auth.get(this);
 		if (roomGroup === this.tempGroup || roomGroup === ' ') {
@@ -244,7 +232,7 @@ Users.User.prototype.getIdentity = function (room: BasicRoom | null = null): str
 	}
 
 	if (this.semilocked) {
-		return (punishgroups.muted?.symbol || '!') + this.name;
+		return (punishgroups.muted?.symbol ?? '!') + this.name;
 	}
 
 	return customSymbol + this.name;
