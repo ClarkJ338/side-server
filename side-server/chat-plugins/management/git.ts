@@ -1,17 +1,9 @@
-/*
-* Pokemon Showdown
-* Git Commands
-* Allows pulling git changes directly from chatrooms.
-* @author PrinceSky-Git
-* @license MIT
-*/
-
 import { FS, Utils } from '../../../lib';
 import { execSync } from 'child_process';
 
 const findGitRoot = async (startPath: string): Promise<string | null> => {
 	let currentPath = FS(startPath);
-	const rootPath = FS('/').path; // Treat the filesystem root as the ultimate stop
+	const rootPath = FS('/').path;
 
 	while (true) {
 		const gitPath = currentPath.resolve('.git');
@@ -22,7 +14,6 @@ const findGitRoot = async (startPath: string): Promise<string | null> => {
 
 		const parentPath = currentPath.parentDir().path;
 
-		// Stop if we reach the root path or if the parent path is the same (e.g., already at root)
 		if (currentPath.path === rootPath || parentPath === currentPath.path) {
 			return null;
 		}
