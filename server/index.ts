@@ -86,6 +86,9 @@ function setupGlobals() {
 		global.__version.tree = hash;
 	});
 
+	// side-server global namespace
+	global.SS = {};
+
 	const { Dex } = require('../sim/dex');
 	global.Dex = Dex;
 	global.toID = Dex.toID;
