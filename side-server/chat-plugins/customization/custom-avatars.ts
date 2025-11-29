@@ -1,20 +1,14 @@
-/*
-* Pokemon Showdown - Impulse Server
-* Custom Avatars chat-plugin.
-* @license MIT
-*/
-
 import { FS } from '../../../lib';
 import { toID } from '../../../sim/dex';
 
 const CONFIG = {
 	path: 'config/avatars/',
 	staffRoom: 'staff',
-	maxSize: 5 * 1024 * 1024, // 5MB
+	maxSize: 5 * 1024 * 1024,
 	timeout: 10000,
 };
 
-const IMAGE_FORMATS: { [ext: string]: number[] } = {
+const IMAGE_FORMATS: Record<string, number[]> = {
 	'.png': [0x89, 0x50, 0x4E, 0x47],
 	'.jpg': [0xFF, 0xD8, 0xFF],
 	'.gif': [0x47, 0x49, 0x46],
@@ -33,14 +27,12 @@ const isValidImageSignature = (buffer: Uint8Array, ext: string) => {
 };
 
 const displayAvatar = (filename: string) => {
-	// Adding timestamp (v=Date.now()) is crucial here to force the browser to reload the image
-	// after we overwrote it, otherwise it shows the cached old version.
 	const url = `${CONFIG.baseUrl}${filename}?v=${Date.now()}`;
 	return `<img src='${url}' width='80' height='80'>`;
 };
 
 const notifyChanges = (
-	user: string, 
+	user: User, 
 	targetId: string, 
 	action: 'set' | 'delete', 
 	filename?: string
@@ -64,7 +56,7 @@ const notifyChanges = (
 	}
 
 	Rooms.get(CONFIG.staffRoom)?.add(`|html|<div class="infobox">${staffMsg}</div>`).update();
-	if (targetUser?.connected) targetUser.popup(`|html|${userMsg}`);
+	targetUser?.connected && targetUser.popup(`|html|${userMsg}`);
 };
 
 const deleteUserFiles = async (userId: string) => {
@@ -100,7 +92,7 @@ const downloadImage = async (urlStr: string, name: string, ext: string) => {
 		
 		return { success: true };
 	} catch (err: any) {
-		return { error: err.message || 'Unknown error' };
+		return { error: err.message ?? 'Unknown error' };
 	}
 };
 
@@ -172,7 +164,7 @@ export const commands: Chat.ChatCommands = {
 		help() {
 			if (!this.runBroadcast()) return;
 			this.sendReplyBox(
-				`<center><strong>Custom Avatar Commands</strong><br>Alias: /cc</center><hr>` +
+				`<center><strong>Custom Avatar Commands</strong><br>Alias: /ca</center><hr>` +
 				`<code>/ca set [user], [url]</code> - Set a user's avatar (&).<br>` +
 				`<code>/ca delete [user]</code> - Remove a user's avatar (&).<br>` +
 				`<small>Formats: JPG, PNG, GIF. Max 5MB.</small>`
