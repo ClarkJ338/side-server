@@ -31,7 +31,7 @@ let data: EmoticonData = {
 let emoticons: { [key: string]: string } = {};
 let emoteRegex = /^$/g;
 
-Impulse.ignoreEmotes = {} as { [userId: string]: boolean };
+SS.ignoreEmotes = {} as { [userId: string]: boolean };
 
 const getEmoteSize = (): string => (data.emoteSize || 32).toString();
 
