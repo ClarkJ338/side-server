@@ -1,8 +1,3 @@
-/*
-* Pokemon Showdown
-* Poof Commands
-*/
-
 interface PoofConfig {
 	poofOff?: boolean;
 }
@@ -55,7 +50,7 @@ const messages: string[] = [
 ];
 
 const generateRandomColor = (): string => {
-	return "#" + Array(3).fill(0).map(() => {
+	return "#" + Array.from({ length: 3 }, () => {
 		const part = Math.floor(Math.random() * 0xaa);
 		return (part < 0x10 ? "0" : "") + part.toString(16);
 	}).join("");
@@ -93,7 +88,7 @@ export const commands: Chat.ChatCommands = {
 			if (!this.canTalk(formattedMessage)) return;
 
 			const colour = generateRandomColor();
-			const msg = `<center><strong><font color="${colour}">~~ ${formattedMessage || target} ` +
+			const msg = `<center><strong><font color="${colour}">~~ ${formattedMessage} ` +
 				`~~</font></strong></center>`;
 			room.addRaw(msg);
 			user.disconnectAll();
