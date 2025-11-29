@@ -1,15 +1,10 @@
-/*
-* Pokemon Showdown - Side Server
-* Custom Colors chat-plugin.
-* @license MIT
-*/
 import * as crypto from 'crypto';
 import https from 'https';
 import { FS, Utils } from '../../../lib';
 import { toID } from '../../../sim/dex';
 
 interface RGB { R: number; G: number; B: number }
-interface CustomColors { [userid: string]: string }
+type CustomColors = Record<string, string>;
 
 const DATA_FILE = 'side-server/db/custom-colors.json';
 const STAFF_ROOM_ID = 'staff';
@@ -120,7 +115,7 @@ export const nameColor = (name: string, bold = true, userGroup = false): string 
 	const symbol = userGroup && Users.globalAuth.get(userId) ?
 		`<font color=#948A88>${Users.globalAuth.get(userId)}</font>` :
 		'';
-	const userName = Utils.escapeHTML(Users.getExact(name)?.name || name);
+	const userName = Utils.escapeHTML(Users.getExact(name)?.name ?? name);
 	return `${symbol}${bold ? '<b>' : ''}<font color=${hashColor(name)}>${userName}</font>${bold ? '</b>' : ''}`;
 };
 
@@ -166,9 +161,8 @@ const updateColorsCSS = async () => {
 				const pre = fileContent.substring(0, startIndex);
 				const post = fileContent.substring(endIndex + COLORS_END_TAG.length);
 				return pre + cssBlock + post;
-			} else {
-				return `${fileContent}\n${cssBlock}\n`;
 			}
+			return `${fileContent}\n${cssBlock}\n`;
 		});
 
 		if (typeof Impulse !== 'undefined' && Impulse.reloadCSS) {
@@ -180,10 +174,7 @@ const updateColorsCSS = async () => {
 };
 
 const notifyStaffRoom = (message: string) => {
-	const staffRoom = Rooms.get(STAFF_ROOM_ID);
-	if (staffRoom) {
-		staffRoom.add(`|html|<div class="infobox">${message}</div>`).update();
-	}
+	Rooms.get(STAFF_ROOM_ID)?.add(`|html|<div class="infobox">${message}</div>`).update();
 };
 
 const sendColorNotifications = (user: User, targetName: string, color: string | null) => {
@@ -198,9 +189,7 @@ const sendColorNotifications = (user: User, targetName: string, color: string | 
 		}
 		notifyStaffRoom(`${userNameColor} set custom color for ${targetNameColor} to ${color}.`);
 	} else {
-		if (targetUser?.connected) {
-			targetUser.popup(`${user.name} removed your custom color.`);
-		}
+		targetUser?.connected && targetUser.popup(`${user.name} removed your custom color.`);
 		notifyStaffRoom(`${userNameColor} removed custom color for ${targetNameColor}.`);
 	}
 };
@@ -224,7 +213,6 @@ export const commands: Chat.ChatCommands = {
 			}
 
 			addCustomColor(targetId, color);
-			
 			await updateColorsCSS();
 
 			const escapedName = Utils.escapeHTML(name);
@@ -247,7 +235,6 @@ export const commands: Chat.ChatCommands = {
 			}
 			
 			removeCustomColor(targetId);
-			
 			await updateColorsCSS();
 
 			this.sendReply(`You removed ${target}'s custom color.`);
