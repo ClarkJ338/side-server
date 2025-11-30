@@ -13,7 +13,6 @@ const getErrorMessage = (err: unknown): string => {
 export const commands: Chat.ChatCommands = {
 	async fileread(target, room, user): Promise<void> {
 		if (!this.runBroadcast()) return;
-		this.checkCan('bypassall');
 		checkWhitelist(user);
 
 		if (!target) {
@@ -206,7 +205,7 @@ export const commands: Chat.ChatCommands = {
 				method: 'POST',
 				headers: {
 					'Accept': 'application/vnd.github+json',
-					'Authorization': `Bearer ${Config.githubToken}`,
+					'Authorization': `Bearer ${Config.GithubToken}`,
 					'X-GitHub-Api-Version': '2022-11-28',
 					'User-Agent': 'Pokemon-Showdown',
 				},
