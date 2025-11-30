@@ -16,6 +16,11 @@ exports.port = 8000;
 exports.bindaddress = '0.0.0.0';
 
 /**
+* Github Token required for filed commands.
+*/
+exports.GithubToken = '';
+
+/**
 * Only WhiteListed users can use certain commands e.g all files commands
 */
 exports.WhiteListed = ['clarkj338', 'txbugtrainer'];
